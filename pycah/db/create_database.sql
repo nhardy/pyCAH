@@ -79,7 +79,7 @@ CREATE TABLE game_moves (
 	time TIMESTAMP NOT NULL, -- For ordering of white card placements
 	PRIMARY KEY (gid, round, uid, time),
 	FOREIGN KEY (gid) REFERENCES games(gid),
-	FOREIGN KEY (round) REFERENCES game_czar(round)
+	FOREIGN KEY (round) REFERENCES game_czar(round),
 	FOREIGN KEY (uid) REFERENCES users(uid),
 	FOREIGN KEY (cid) REFERENCES white_cards(cid)
 );
