@@ -34,7 +34,7 @@ class Game:
 
   def new_round(self):
     cursor = connection.cursor()
-    player = None # Fix
+    player = get_random_player() # Change to proper ordering later
     cursor.execute('''
                    SELECT black_cards.eid, black_cards.cid
                    FROM game_expansions
@@ -58,6 +58,14 @@ class Game:
       players.append(User(player[0], player[1]))
     connection.commit()
     return players
+
+  def get_random_player(self):
+    cursor = connection.cursor()
+    cursor.execute('''SELECT uid, username FROM game_players WHERE gid=%s ORDER BY RANDOM() LIMIT 1''', (self.gid,))
+    player = cursor.fetchone()
+    player = User(player[0], player[1]))
+    connection.commit()
+    return player
 
   @property
   def expansions(self):
