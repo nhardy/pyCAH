@@ -7,6 +7,7 @@ DROP TABLE IF EXISTS game_users CASCADE;
 DROP TABLE IF EXISTS game_expansions CASCADE;
 DROP TABLE IF EXISTS game_czar CASCADE;
 DROP TABLE IF EXISTS game_moves CASCADE;
+DROP TABLE IF EXISTS game_cards CASCADE;
 
 CREATE TABLE users (
 	uid BIGSERIAL PRIMARY KEY,
@@ -84,6 +85,17 @@ CREATE TABLE game_moves (
 	PRIMARY KEY (gid, round, uid, time),
 	FOREIGN KEY (gid) REFERENCES games(gid),
 	FOREIGN KEY (gid, round) REFERENCES game_czar(gid, round),
+	FOREIGN KEY (gid, uid) REFERENCES game_users(gid, uid),
+	FOREIGN KEY (eid, cid) REFERENCES white_cards(eid, cid)
+);
+
+CREATE TABLE game_cards (
+	gid BIGINT NOT NULL,
+	uid BIGINT NOT NULL,
+	eid SMALLINT NOT NULL,
+	cid SMALLINT NOT NULL,
+	PRIMARY KEY (gid, uid, eid, cid),
+	FOREIGN KEY (gid) REFERENCES games(gid),
 	FOREIGN KEY (gid, uid) REFERENCES game_users(gid, uid),
 	FOREIGN KEY (eid, cid) REFERENCES white_cards(eid, cid)
 );
