@@ -16,34 +16,37 @@ class User:
       return False # Username is already taken
     salt = ''.join([random.choice(string.printable) for _ in range(64)])
     password = password_hash(password, salt)
-    cursor.execute('''INSERT INTO users VALUES(DEFAULT,%s,%s,%s)''', (username, password, salt))
+    cursor.execute('''INSERT INTO users VALUES(DEFAULT,%s,%s,%s) RETURNING uid''', (username, password, salt))
+    uid = cursor.fetchone()[0]
     connection.commit()
-    return cls(username)
+    return cls(uid, username)
 
   @classmethod
   def login(cls, username, password):
     cursor = connection.cursor()
-    cursor.execute('''SELECT password, salt FROM users WHERE username=%s''', (username,))
+    cursor.execute('''SELECT uid, password, salt FROM users WHERE username=%s''', (username,))
     user = cursor.fetchone()
     connection.commit()
     if user is None:
       return None # No such user exists
     else:
-      if user[0] == password_hash(password, user[1]):
-        return cls(username)
+      if user[1] == password_hash(password, user[2]):
+        return cls(user[0], username)
       else:
         return False # Wrong password
 
   @classmethod
   def from_username(cls, username):
     cursor = connection.cursor()
-    cursor.execute('''SELECT COUNT(*) FROM users WHERE username=%s''', (username,))
-    exists = cursor.fetchone()[0] == 1
+    cursor.execute('''SELECT uid FROM users WHERE username=%s''', (username,))
+    user = cursor.fetchone()
     connection.commit()
-    if not exists:
+    if not user:
       return None # No such user exists
     else:
-      return cls(username)
+      uid = user[0]
+      return cls(uid, username)
 
-  def __init__(self, username):
+  def __init__(self, uid, username):
+    self.uid = uid
     self.username = username
