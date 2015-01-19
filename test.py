@@ -59,5 +59,16 @@ for c in white_cards:
   print(c[0])
 print('Test complete.')
 
-
-
+print('Game test...')
+u1 = User.create('user1', 'password')
+u2 = User.create('user2', 'password')
+u3 = User.create('user3', 'password')
+g = Game.create(10, u1, [1,2,3,4])
+g.add_player(u2)
+g.add_player(u3)
+czar, b_card = g.new_round()
+print([c.value for c in g.get_hand(u1)])
+print([c.value for c in g.get_hand(u2)])
+print([c.value for c in g.get_hand(u3)])
+print(czar.username, b_card.value)
+print('Done.')
