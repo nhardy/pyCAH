@@ -47,6 +47,18 @@ class User:
       uid = user[0]
       return cls(uid, username)
 
+  @classmethod
+  def from_uid(cls, uid):
+    cursor = connection.cursor()
+    cursor.execute('''SELECT username FROM users WHERE uid=%s''', (uid,))
+    user = cursor.fetchone()
+    connection.commit()
+    if not user:
+      return None # No such user exists
+    else:
+      username = user[0]
+      return cls(uid, username)
+
   def __init__(self, uid, username):
     self.uid = uid
     self.username = username
