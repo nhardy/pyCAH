@@ -1,6 +1,5 @@
-import psycopg2
+from . import connection
 
-connection = psycopg2.connect(database='pycah', user='postgres', password='password')
 connection.set_session(autocommit=True)
 cursor = connection.cursor()
 cursor.execute(open('create_database.sql').read())
