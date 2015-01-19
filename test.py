@@ -1,4 +1,5 @@
 from pycah.db.user import User
+from pycah.db.game import Game
 from pycah.db import connection
 
 import re
@@ -24,16 +25,39 @@ try:
       line = l.strip()
       cursor.execute('''INSERT INTO white_cards VALUES(%s,DEFAULT,%s,%s)''', (eid, False, line))
   connection.commit()
-  print('Finished importing')
+  print('Finished importing Australian Edition')
 except Exception as e:
-  print('Failed to import')
+  print('Failed to import Australian Edition')
   raise e
 
-cursor.execute('''SELECT value, type FROM black_cards WHERE eid=%s AND cid>=(SELECT COUNT(*) FROM black_cards WHERE eid=%s)*RANDOM() ORDER BY cid LIMIT 1''', (eid, eid))
+try:
+  print('Importing the rest...')
+  cards = eval(open('./pycah/db/cards/rest.json').read())
+  expansions = {}
+  for card in cards:
+    if card['expansion'] not in expansions:
+      cursor.execute('''INSERT INTO expansions VALUES(DEFAULT,%s) RETURNING eid''', (card['expansion'],))
+      expansions[card['expansion']] = cursor.fetchone()[0]
+    if card['numAnswers'] == 0:
+      cursor.execute('''INSERT INTO white_cards VALUES(%s,DEFAULT,%s,%s)''', (expansions[card['expansion']], False, card['text']))
+    else:
+      cursor.execute('''INSERT INTO black_cards VALUES(%s,DEFAULT,%s,%s)''', (expansions[card['expansion']], card['numAnswers'], card['text']))
+  connection.commit()
+  print('Finished importing the rest')
+except Exception as e:
+  print('Failed to import the rest')
+  raise e
+
+print('Testing random cards: ')
+cursor.execute('''SELECT value, type FROM black_cards black_cards ORDER BY RANDOM() LIMIT 1''')
 black_card = cursor.fetchone()
 connection.commit()
 print(black_card[0])
-cursor.execute('''SELECT value FROM white_cards WHERE eid=%s AND cid>=(SELECT COUNT(*) FROM white_cards WHERE eid=%s)*RANDOM() ORDER BY cid LIMIT %s''', (eid, eid, black_card[1]))
+cursor.execute('''SELECT value FROM white_cards ORDER BY RANDOM() LIMIT %s''', (black_card[1],))
 white_cards = cursor.fetchall()
 for c in white_cards:
   print(c[0])
+print('Test complete.')
+
+
+
