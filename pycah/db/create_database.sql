@@ -64,10 +64,13 @@ CREATE TABLE game_czar (
 	gid BIGINT NOT NULL,
 	round SMALLSERIAL,
 	czar_id BIGINT NOT NULL,
+	eid SMALLINT NOT NULL,
+	cid SMALLINT NOT NULL,
 	winner_id BIGINT,
 	PRIMARY KEY (gid, round),
 	FOREIGN KEY (gid) REFERENCES games(gid),
 	FOREIGN KEY (czar_id) REFERENCES users(uid),
+	FOREIGN KEY (eid, cid) REFERENCES black_cards(eid, cid),
 	FOREIGN KEY (winner_id) REFERENCES users(uid)
 );
 
@@ -75,11 +78,12 @@ CREATE TABLE game_moves (
 	gid BIGINT NOT NULL,
 	round SMALLINT NOT NULL,
 	uid BIGINT NOT NULL,
+	eid SMALLINT NOT NULL,
 	cid SMALLINT NOT NULL,
 	time TIMESTAMP NOT NULL, -- For ordering of white card placements
 	PRIMARY KEY (gid, round, uid, time),
 	FOREIGN KEY (gid) REFERENCES games(gid),
-	FOREIGN KEY (round) REFERENCES game_czar(round),
+	FOREIGN KEY (gid, round) REFERENCES game_czar(gid, round),
 	FOREIGN KEY (uid) REFERENCES users(uid),
-	FOREIGN KEY (cid) REFERENCES white_cards(cid)
+	FOREIGN KEY (eid, cid) REFERENCES white_cards(eid, cid)
 );
