@@ -94,6 +94,7 @@ CREATE TABLE game_cards (
 	uid BIGINT NOT NULL,
 	eid SMALLINT NOT NULL,
 	cid SMALLINT NOT NULL,
+	used BOOLEAN NOT NULL,
 	PRIMARY KEY (gid, uid, eid, cid),
 	FOREIGN KEY (gid) REFERENCES games(gid),
 	FOREIGN KEY (gid, uid) REFERENCES game_users(gid, uid),
