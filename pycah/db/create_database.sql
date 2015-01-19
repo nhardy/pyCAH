@@ -1,12 +1,12 @@
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS expansions;
-DROP TABLE IF EXISTS black_cards;
-DROP TABLE IF EXISTS white_cards;
-DROP TABLE IF EXISTS games;
-DROP TABLE IF EXISTS game_users;
-DROP TABLE IF EXISTS game_expansions;
-DROP TABLE IF EXISTS game_czar;
-DROP TABLE IF EXISTS game_moves;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS expansions CASCADE;
+DROP TABLE IF EXISTS black_cards CASCADE;
+DROP TABLE IF EXISTS white_cards CASCADE;
+DROP TABLE IF EXISTS games CASCADE;
+DROP TABLE IF EXISTS game_users CASCADE;
+DROP TABLE IF EXISTS game_expansions CASCADE;
+DROP TABLE IF EXISTS game_czar CASCADE;
+DROP TABLE IF EXISTS game_moves CASCADE;
 
 CREATE TABLE users (
 	uid BIGSERIAL PRIMARY KEY,
@@ -69,9 +69,9 @@ CREATE TABLE game_czar (
 	winner_id BIGINT,
 	PRIMARY KEY (gid, round),
 	FOREIGN KEY (gid) REFERENCES games(gid),
-	FOREIGN KEY (czar_id) REFERENCES users(uid),
+	FOREIGN KEY (gid, czar_id) REFERENCES game_users(gid, uid),
 	FOREIGN KEY (eid, cid) REFERENCES black_cards(eid, cid),
-	FOREIGN KEY (winner_id) REFERENCES users(uid)
+	FOREIGN KEY (gid, winner_id) REFERENCES game_users(gid, uid)
 );
 
 CREATE TABLE game_moves (
@@ -84,6 +84,6 @@ CREATE TABLE game_moves (
 	PRIMARY KEY (gid, round, uid, time),
 	FOREIGN KEY (gid) REFERENCES games(gid),
 	FOREIGN KEY (gid, round) REFERENCES game_czar(gid, round),
-	FOREIGN KEY (uid) REFERENCES users(uid),
+	FOREIGN KEY (gid, uid) REFERENCES game_users(gid, uid),
 	FOREIGN KEY (eid, cid) REFERENCES white_cards(eid, cid)
 );
