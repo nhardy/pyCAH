@@ -2,7 +2,7 @@ import tornado.ioloop
 import tornado.web
 import random, string
 
-from pycah.handlers import HomeHandler, LoginHandler, RegisterHandler, GameHandler, StaticFileHandler
+from pycah.handlers import HomeHandler, LoginHandler, RegisterHandler, GameHandler, LogoutHandler, StaticFileHandler
 
 def application():
   return tornado.web.Application(
@@ -11,6 +11,7 @@ def application():
                                   (r'/login', LoginHandler),
                                   (r'/register', RegisterHandler),
                                   (r'/game', GameHandler),
+                                  (r'/logout', LogoutHandler),
                                   # Additional Handlers here
                                   (r'/styles/(.*)', StaticFileHandler, {'path': './pycah/static/styles/'}),
                                   (r'/images/(.*)', StaticFileHandler, {'path': './pycah/static/images/'}),
