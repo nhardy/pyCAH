@@ -1,7 +1,9 @@
 {% include header.html %}
 <article>
 <form method="POST">
-<input type="number" name="points" value="6" />
+<label for="points">Points to win</label>:
+<br />
+<input type="number" name="points" value="6" min="2" max="32" />
 <fieldset>
 <legend>Expansions</legend>
 {% for e in expansions %}
