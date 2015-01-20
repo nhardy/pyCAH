@@ -11,13 +11,15 @@
 </ul>
 </div>
 {% end if %}
-<input type="text" name="username" placeholder="Username" />
+<input type="text" name="username" autocomplete="off" autofocus="autofocus" placeholder="Username" />
 <br />
-<input type="password" name="password" placeholder="Password" />
+<input type="password" name="password" autocomplete="off" placeholder="Password" />
 <br />
-<input type="password" name="confirm" placeholder="Confirm" />
+<input type="password" name="confirm" autocomplete="off" placeholder="Confirm" />
 <br />
-<input type="submit" value="Login" />
+<input type="submit" value="Register" />
+<br />
+<span><a href="/login">Login</a> as existing user instead.</span>
 </form>
 </article>
 {% include footer.html %}

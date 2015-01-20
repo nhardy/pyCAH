@@ -11,11 +11,13 @@
 </ul>
 </div>
 {% end if %}
-<input type="text" name="username" placeholder="Username" />
+<input type="text" name="username" autofocus="autofocus" placeholder="Username" />
 <br />
 <input type="password" name="password" placeholder="Password" />
 <br />
 <input type="submit" value="Login" />
+<br />
+<span><a href="/register">Register</a> as new user instead.</span>
 </form>
 </article>
 {% include footer.html %}
