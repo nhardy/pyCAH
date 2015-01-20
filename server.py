@@ -1,7 +1,8 @@
 import tornado.ioloop
 import tornado.web
+import random, string
 
-from pycah.handlers import *
+from pycah.handlers import HomeHandler, LoginHandler, RegisterHandler, GameHandler, StaticFileHandler
 
 def application():
   return tornado.web.Application(
@@ -17,7 +18,9 @@ def application():
                                   (r'/js/(.*)', StaticFileHandler, {'path': './pycah/static/js/'}),
                                   (r'/robots.txt()', StaticFileHandler, {'path': './pycah/static/robots.txt'})
                                  ],
-                                 template_path='./pycah/templates/'
+                                 template_path='./pycah/templates/',
+                                 cookie_secret=''.join([random.choice(string.printable) for _ in range(63)]),
+                                 debug=True
                                 )
 
 def main():
