@@ -88,6 +88,16 @@ class Game:
     connection.commit()
     return player
 
+  def is_in(self, player):
+    cursor = connection.cursor()
+    cursor.execute('''SELECT COUNT(*) FROM game_users WHERE gid=%s AND uid=%s''', (self.gid, player.uid))
+    if cursor.fetchone()[0] == 0:
+      connection.commit()
+      return False
+    else:
+      connection.commit()
+      return True
+
   def get_hand(self, player):
     cursor = connection.cursor()
     cursor.execute('''SELECT eid, cid FROM game_cards WHERE gid=%s AND uid=%s AND used=%s''', (self.gid, player.uid, False))

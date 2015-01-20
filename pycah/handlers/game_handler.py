@@ -8,8 +8,10 @@ import re
 class GameHandler(tornado.web.RequestHandler):
   def _create(self, errors=False):
     self.render('game_create.html', handler=self, title='Create Game', errors=errors, expansions=Expansion.list_all())
-  def _game(self, gid):
-    self.render('game.html', handler=self, title='Playing pyCAH', gid=gid)
+  def _waiting(self, game, user):
+    self.render('game_waiting.html', handler=self, title='Waiting Room', game=game, user=user)
+  def _game(self, game, user):
+    self.render('game.html', handler=self, title='Playing pyCAH', game=game, user=user)
   def get(self, page):
     user = current_user(self)
     if not user:
@@ -22,7 +24,12 @@ class GameHandler(tornado.web.RequestHandler):
         if gid is None:
           self.redirect('/')
         else:
-          self._game(int(gid.group(1)))
+          game = Game.from_gid(gid.group(1))
+          if not game.started or not game.is_in(user):
+            self._waiting(game, user)
+          else:
+            self._game(game, user)
+
   def post(self, page):
     user = current_user(self)
     if not user:

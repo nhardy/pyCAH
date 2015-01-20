@@ -1,5 +1,33 @@
 {% include header.html %}
 <article>
-<p>Coming soon...</p>
+{% if game.is_in(user) %}
+<pre>
+/------------------+-\ /--------------------+-\
+| Current players  | | | Expansions         | |
++------------------+-+ +--------------------+-+
+| user1            |^| | Base               |^|
+| user2            | | | Australian Edition | |
+| ...              |v| | CAHe1              | |
++------------------+-+ | CAHe2              | |
+| Link: [link]     | | | ...                |v|
+\------------------+-/ \--------------------+-/
+</pre>
+<p>Link to game: <a href="/game/{{ game.gid }}">Share me</a></p>
+{% else %}
+<pre>
+/------------------+-\ /--------------------+-\
+| Current players  | | | Expansions         | |
++------------------+-+ +--------------------+-+
+| user1            |^| | Base               |^|
+| user2            | | | Australian Edition | |
+| ...              |v| | CAHe1              | |
++------------------+-+ | CAHe2              | |
+| [Join][Spectate] | | | ...                |v|
+\------------------+-/ \--------------------+-/
+</pre>
+<form method="POST">
+<input type="submit" name="do" value="Join" /> <input type="submit" name="do" value="Spectate">
+</form>
+{% end if %}
 </article>
 {% include footer.html %}
