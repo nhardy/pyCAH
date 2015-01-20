@@ -1,0 +1,14 @@
+{% include header.html %}
+<article>
+<form method="POST">
+<input type="number" name="points" value="6" />
+<fieldset>
+{% for e in expansions %}
+<span class="nowrap" title="{{ e.description }}"><input type="checkbox" name="expansion" value="{{ e.eid }}" /> {{ e.name }}</span>
+{% end for %}
+</fieldset>
+<br />
+<input type="submit" value="Create" />
+</form>
+</article>
+{% include footer.html %}

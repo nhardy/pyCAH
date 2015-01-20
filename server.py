@@ -10,7 +10,7 @@ def application():
                                   (r'/', HomeHandler),
                                   (r'/login', LoginHandler),
                                   (r'/register', RegisterHandler),
-                                  (r'/game', GameHandler),
+                                  (r'/game(.*)', GameHandler),
                                   (r'/logout', LogoutHandler),
                                   # Additional Handlers here
                                   (r'/styles/(.*)', StaticFileHandler, {'path': './pycah/static/styles/'}),
