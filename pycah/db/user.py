@@ -62,3 +62,9 @@ class User:
   def __init__(self, uid, username):
     self.uid = uid
     self.username = username
+
+  def __eq__(self, other):
+    if isinstance(other, User) and other.uid == self.uid:
+      return True
+    else:
+      return False
