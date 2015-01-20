@@ -3,7 +3,7 @@ from ..db.user import User, current_user
 
 class LoginHandler(tornado.web.RequestHandler):
   def _page(self, errors=False):
-    self.render('login.html', handler=self, title='Login')
+    self.render('login.html', handler=self, title='Login', errors=errors)
   def get(self):
     if current_user(self):
       self.redirect('/')
@@ -18,6 +18,6 @@ class LoginHandler(tornado.web.RequestHandler):
     elif user == False:
       self._page(['Incorrect password.'])
     else:
-      self.set_secure_cookie('uid', user.uid)
+      self.set_secure_cookie('uid', str(user.uid))
       self.redirect('/')
 

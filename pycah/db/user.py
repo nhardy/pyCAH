@@ -6,11 +6,11 @@ def password_hash(password, salt):
   return hashlib.sha256((password + salt).encode('utf-8')).hexdigest()
 
 def current_user(handler):
-  username = handler.get_secure_cookie('username')
-  if username is None:
+  uid = handler.get_secure_cookie('uid')
+  if uid is None:
     return None
   else:
-    return User.from_username(username.decode())
+    return User.from_uid(int(uid.decode()))
 
 class User:
   @classmethod
