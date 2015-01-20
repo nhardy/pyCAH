@@ -25,7 +25,9 @@ class GameHandler(tornado.web.RequestHandler):
           self.redirect('/')
         else:
           game = Game.from_gid(gid.group(1))
-          if not game.started or not game.is_in(user):
+          if game is None:
+            self.redirect('/')
+          elif not game.started or not game.is_in(user):
             self._waiting(game, user)
           else:
             self._game(game, user)
@@ -63,4 +65,17 @@ class GameHandler(tornado.web.RequestHandler):
           game = Game.create(points_to_win, user, chosen_expansions)
           self.redirect('/game/{}'.format(game.gid))
       else:
-        raise NotImplemented
+        gid = re.search(r'^\/(\d+)$', page)
+        if gid is None:
+          self.redirect('/')
+        else:
+          game = Game.from_gid(gid.group(1))
+          if game is None:
+            self.redirect('/')
+          else:
+            do = self.get_argument('do')
+            if do == 'Join':
+              game.add_player(user)
+              self.redirect('/game/{}'.format(game.gid))
+            else:
+              self.redirect('/game/{}/spectate'.format(game.gid))
