@@ -9,8 +9,8 @@ class Game:
     cursor.execute('''INSERT INTO games VALUES(DEFAULT,%s) RETURNING gid''', (points_to_win,))
     gid = cursor.fetchone()[0]
     cursor.execute('''INSERT INTO game_users VALUES(%s,%s)''', (gid, player.uid))
-    for eid in expansions:
-      cursor.execute('''INSERT INTO game_expansions VALUES(%s,%s)''', (gid, eid))
+    for expansion in expansions:
+      cursor.execute('''INSERT INTO game_expansions VALUES(%s,%s)''', (gid, expansion.eid))
     connection.commit()
     return cls(gid, points_to_win)
 
