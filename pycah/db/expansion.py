@@ -4,7 +4,7 @@ class Expansion:
   @staticmethod
   def list_all():
     cursor = connection.cursor()
-    cursor.execute('''SELECT eid, name, description, (SELECT COUNT(*) FROM black_cards WHERE black_cards.eid=expansions.eid) as num_black, (SELECT COUNT(*) FROM white_cards WHERE white_cards.eid=expansions.eid) as num_white FROM expansions''')
+    cursor.execute('''SELECT eid, name, description, (SELECT COUNT(*) FROM black_cards WHERE black_cards.eid=expansions.eid) as num_black, (SELECT COUNT(*) FROM white_cards WHERE white_cards.eid=expansions.eid) as num_white FROM expansions ORDER BY eid''')
     expansions = []
     for expansion in cursor.fetchall():
       expansions.append(Expansion(expansion[0], expansion[1], expansion[2], expansion[3], expansion[4]))

@@ -3,6 +3,7 @@
 <form method="POST">
 <input type="number" name="points" value="6" />
 <fieldset>
+<legend>Expansions</legend>
 {% for e in expansions %}
 <span class="nowrap" title="{{ e.description }}"><input type="checkbox" name="expansion" value="{{ e.eid }}" /> {{ e.name }}</span>
 {% end for %}
