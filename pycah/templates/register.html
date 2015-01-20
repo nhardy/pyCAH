@@ -1,0 +1,23 @@
+{% include header.html %}
+<article>
+<form method="POST">
+{% if errors %}
+<div id="errors">
+<p>The following errors occurred whilst attempting to register:</p>
+<ul>
+{% for e in errors %}
+<li>{{ e }}</li>
+{% end for %}
+</ul>
+</div>
+{% end if %}
+<input type="text" name="username" placeholder="Username" />
+<br />
+<input type="password" name="password" placeholder="Password" />
+<br />
+<input type="password" name="confirm" placeholder="Confirm" />
+<br />
+<input type="submit" value="Login" />
+</form>
+</article>
+{% include footer.html %}
