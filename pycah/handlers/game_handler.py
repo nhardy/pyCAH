@@ -12,6 +12,8 @@ class GameHandler(tornado.web.RequestHandler):
     self.render('game_waiting.html', handler=self, title='Waiting Room', game=game, user=user)
   def _game(self, game, user):
     self.render('game.html', handler=self, title='Playing pyCAH', game=game, user=user)
+  def _spectate(self, game, user):
+    self.render('game_spectate.html', handler=self, title='Spectating pyCAH', game=game, user=user)
   def get(self, page):
     user = current_user(self)
     if not user:
@@ -20,13 +22,15 @@ class GameHandler(tornado.web.RequestHandler):
       if page == '':
         self._create()
       else:
-        gid = re.search(r'^\/(\d+)$', page)
+        gid = re.search(r'^\/(\d+)((?:\/spectate)?)$', page)
         if gid is None:
           self.redirect('/')
         else:
           game = Game.from_gid(gid.group(1))
           if game is None:
             self.redirect('/')
+          elif gid.group(2) != '':
+            self._spectate(game, user)
           elif not game.started or not game.is_in(user):
             self._waiting(game, user)
           else:
