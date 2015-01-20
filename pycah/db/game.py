@@ -52,8 +52,8 @@ class Game:
     cursor.execute('''INSERT INTO game_czar VALUES(%s,DEFAULT,%s,%s,%s,NULL)''', (self.gid, player.uid, eid, cid))
     connection.commit()
     card = BlackCard(eid, cid)
-    for player in self.get_players():
-      self.fill_hand(player, 10 + card.draw)
+    for p in self.get_players():
+      self.fill_hand(p, 10 + card.draw)
     return (player, card)
 
   def fill_hand(self, player, amount=10):
@@ -90,12 +90,52 @@ class Game:
 
   def get_hand(self, player):
     cursor = connection.cursor()
-    cursor.execute('''SELECT eid, cid FROM game_cards WHERE gid=%s AND uid=%s''', (self.gid, player.uid))
+    cursor.execute('''SELECT eid, cid FROM game_cards WHERE gid=%s AND uid=%s AND used=%s''', (self.gid, player.uid, False))
     cards = []
     for card in cursor.fetchall():
       cards.append(WhiteCard(card[0], card[1]))
     connection.commit()
     return cards
+
+  def get_czar(self):
+    cursor = connection.cursor()
+    cursor.execute('''SELECT game_czar.czar_id, users.username FROM game_czar LEFT JOIN users ON game_czar.czar_id=users.uid WHERE gid=%s and round=(SELECT MAX(round) FROM game_czar WHERE gid=%s)''', (self.gid, self.gid))
+    czar = cursor.fetchone()
+    connection.commit()
+    return User(czar[0], czar[1])
+
+  def get_black_card(self):
+    cursor = connection.cursor()
+    cursor.execute('''SELECT eid, cid FROM game_czar WHERE gid=%s AND round=(SELECT MAX(round) FROM game_czar WHERE gid=%s)''', (self.gid, self.gid))
+    card = cursor.fetchone()
+    card = BlackCard(card[0], card[1])
+    connection.commit()
+    return card
+
+  def play_card(self, player, card):
+    if player == self.get_czar():
+      return False # Czar may not play cards
+    cursor = connection.cursor()
+    cursor.execute('''
+                   UPDATE game_cards SET used=%s
+                   WHERE
+                     gid=%s AND uid=%s AND eid=%s AND cid=%s
+                     AND
+                       (
+                        SELECT COUNT(*) FROM game_moves
+                        WHERE gid=%s AND uid=%s
+                          AND round=(SELECT MAX(round) FROM game_czar WHERE gid=%s)
+                       ) < %s
+                   RETURNING %s''',
+                   (True, self.gid, player.uid, card.eid, card.cid, self.gid, player.uid, self.gid, self.get_black_card().answers, True))
+    can_play = cursor.fetchone()
+    if can_play is None:
+      connection.commit()
+      return False # Player did not have this card or had already played enough cards
+    else:
+      cursor.execute('''INSERT INTO game_moves VALUES(%s,(SELECT MAX(round) FROM game_czar WHERE gid=%s),%s,%s,%s,NOW())''', (self.gid, self.gid, player.uid, card.eid, card.cid))
+      connection.commit()
+      return True # Play was successful
 
   @property
   def expansions(self):

@@ -2,7 +2,7 @@ from pycah.db.user import User
 from pycah.db.game import Game
 from pycah.db import connection
 
-import re
+import re, json
 
 connection.set_session(autocommit=True)
 cursor = connection.cursor()
@@ -32,7 +32,7 @@ except Exception as e:
 
 try:
   print('Importing the rest...')
-  cards = eval(open('./pycah/db/cards/rest.json').read())
+  cards = json.loads(open('./pycah/db/cards/rest.json').read())
   expansions = {}
   for card in cards:
     if card['expansion'] not in expansions:
@@ -67,8 +67,16 @@ g = Game.create(10, u1, [1,2,3,4])
 g.add_player(u2)
 g.add_player(u3)
 czar, b_card = g.new_round()
-print([c.value for c in g.get_hand(u1)])
-print([c.value for c in g.get_hand(u2)])
-print([c.value for c in g.get_hand(u3)])
+print(u1.username, [c.value for c in g.get_hand(u1)])
+print(u2.username, [c.value for c in g.get_hand(u2)])
+print(u3.username, [c.value for c in g.get_hand(u3)])
 print(czar.username, b_card.value)
+for user in [u1, u2, u3]:
+  if user == czar:
+    continue
+  hand = g.get_hand(user)
+  for i in range(b_card.answers):
+    g.play_card(user, hand[i])
+    print(user.username, 'played', hand[i].value)
+
 print('Done.')
