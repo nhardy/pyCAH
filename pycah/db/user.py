@@ -5,6 +5,13 @@ import hashlib, random, string
 def password_hash(password, salt):
   return hashlib.sha256((password + salt).encode('utf-8')).hexdigest()
 
+def current_user(handler):
+  username = handler.get_secure_cookie('username')
+  if username is None:
+    return None
+  else:
+    return User.from_username(username.decode())
+
 class User:
   @classmethod
   def create(cls, username, password):
