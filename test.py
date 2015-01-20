@@ -1,5 +1,6 @@
 from pycah.db.user import User
 from pycah.db.game import Game
+from pycah.db.expansion import Expansion
 from pycah.db import connection
 
 import re, json
@@ -9,6 +10,12 @@ cursor = connection.cursor()
 cursor.execute(open('./pycah/db/create_database.sql').read())
 connection.set_session(autocommit=False)
 
+print('Importing cards...')
+expansions = {}
+for e in ['Base', 'CAHe1', 'CAHe2', 'CAHe3']:
+  cursor.execute('''INSERT INTO expansions VALUES(DEFAULT,%s) RETURNING eid''', (e,))
+  eid = cursor.fetchone()[0]
+  expansions[e] = eid
 try:
   print('Importing Australian Edition cards...')
   regex = re.compile(r'_+')
@@ -33,7 +40,6 @@ except Exception as e:
 try:
   print('Importing the rest...')
   cards = json.loads(open('./pycah/db/cards/rest.json').read())
-  expansions = {}
   for card in cards:
     if card['expansion'] not in expansions:
       cursor.execute('''INSERT INTO expansions VALUES(DEFAULT,%s) RETURNING eid''', (card['expansion'],))
@@ -63,7 +69,7 @@ print('Game test...')
 u1 = User.create('user1', 'password')
 u2 = User.create('user2', 'password')
 u3 = User.create('user3', 'password')
-g = Game.create(10, u1, [Expansion(i) for i in range(1,11)])
+g = Game.create(10, u1, Expansion.list_all())
 g.add_player(u2)
 g.add_player(u3)
 czar, b_card = g.new_round()
