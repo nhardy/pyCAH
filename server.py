@@ -2,7 +2,10 @@ import tornado.ioloop
 import tornado.web
 import random, string
 
+from tornado import httpserver
+
 from pycah.handlers import HomeHandler, LoginHandler, RegisterHandler, GameHandler, LogoutHandler, StaticFileHandler
+
 
 def application():
   return tornado.web.Application(
@@ -24,8 +27,9 @@ def application():
                                  debug=True
                                 )
 
-def main():
-  application().listen(80)
+def main(): 
+  http_server = httpserver.HTTPServer(application(), xheaders=True)
+  http_server.listen(80)
   tornado.ioloop.IOLoop.instance().start()
 
 if __name__ == '__main__':
