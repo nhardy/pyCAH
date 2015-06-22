@@ -9,6 +9,9 @@
 {% end for %}
 		</ul>
 	</div>
+	<div id="game">
+		<p>Waiting...</p>
+	</div>
 </div>
 <h2>Chat</h2>
 <div id="chat_container">
@@ -17,7 +20,7 @@
 	<div id="players">
 	</div>
 	<div id="send_container">
-		<input id="message" type="text" onkeydown="if (event.keyCode == 13) chat();" />
+		<input id="message" type="text" autocomplete="off" onkeydown="if (event.keyCode == 13) chat();" />
 		<button onclick="chat();">Send</button>
 	</div>
 </div>

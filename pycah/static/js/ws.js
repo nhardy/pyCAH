@@ -13,7 +13,11 @@ function init() {
 		var cmd = content["cmd"];
 		switch(cmd){
 			case "players":
-				document.getElementById("players").innerHTML = content["players"];
+				var players_html = "";
+				for (var p = 0; p < content["players"].length; p++) {
+					players_html += "<p>" + content["players"][p] + "</p>\n";
+				}
+				document.getElementById("players").innerHTML = players_html
 				break;
 			case "chat":
 				var chat = document.getElementById("chat");
