@@ -4,10 +4,22 @@
 <title>{{ title }} - pyCAH</title>
 <meta http-equiv="Content-Type" value="text/html; charset='utf-8';" />
 <link rel="stylesheet" href="/styles/main.css">
+{% if title == 'Waiting Room' %}
+<script type="text/javascript" src="/js/ws.js"></script>
+{% end if %}
 </head>
 <body>
 <header>
 <h1>{{ title }}</h1>
 <h2>An online Cards Against Humanity site written in Python</h2>
+<hr />
+<nav>
+{% if user is None %}
+<a href="/login">Login</a>
+<a href="/register">Register</a>
+{% else %}
+<a href="/game">New Game</a>
+{% end if %}
+</nav>
 <hr />
 </header>

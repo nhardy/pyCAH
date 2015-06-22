@@ -4,7 +4,7 @@ from ..db.user import current_user, User
 
 class RegisterHandler(tornado.web.RequestHandler):
   def _page(self, errors=False):
-    self.render('register.html', handler=self, title='Register', errors=errors)
+    self.render('register.html', handler=self, title='Register', user=None, errors=errors)
   def get(self):
     if current_user(self):
       self.redirect('/')
