@@ -34,11 +34,23 @@
 }
 
 {
-	"cmd": "black_card",
+	"cmd": "new_round",
 	"czar": "###USERNAME###",
 	"eid": "###EID###",
 	"cid": "###CID###",
-	"value": "###VALUE###"
+	"value": "###VALUE###",
+	"hand": [
+		{
+			"eid": "###EID###",
+			"cid": "###CID###",
+			"value": "###VALUE###",
+			"trump": false
+		},
+		{
+			"eid": "###EID###",
+			"cid": "###CID###",
+			"value": "###VALUE###",
+			"trump": true
+		}
+	]
 }
-
-

@@ -24,6 +24,9 @@ function init() {
 				chat.innerHTML += "<p>&lt;" + content["sender"] + "&gt;: " + content["message"] + "</p>\n";
 				chat.scrollTop = chat.scrollHeight;
 				break;
+			default:
+				alert(e.data);
+				break;
 		}
 	};
 }
