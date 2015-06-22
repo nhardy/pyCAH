@@ -4,7 +4,7 @@ import random, string
 
 from tornado import httpserver
 
-from pycah.handlers import HomeHandler, LoginHandler, RegisterHandler, GameHandler, LogoutHandler, StaticFileHandler
+from pycah.handlers import HomeHandler, LoginHandler, RegisterHandler, GameHandler, LogoutHandler, GameWebSocketHandler, StaticFileHandler
 
 
 def application():
@@ -15,7 +15,7 @@ def application():
                                   (r'/register', RegisterHandler),
                                   (r'/game(.*)', GameHandler),
                                   (r'/logout', LogoutHandler),
-                                  # Additional Handlers here
+                                  (r'/ws', GameWebSocketHandler),
                                   (r'/styles/(.*)', StaticFileHandler, {'path': './pycah/static/styles/'}),
                                   (r'/images/(.*)', StaticFileHandler, {'path': './pycah/static/images/'}),
                                   (r'/fonts/(.*)', StaticFileHandler, {'path': './pycah/static/fonts/'}),
