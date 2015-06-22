@@ -1,6 +1,7 @@
 import tornado.websocket
 import json
 import uuid
+import html
 
 from ..db.game import Game
 from ..db.user import current_user
@@ -11,34 +12,48 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
   sockets = {}
   games = {}
   clients = {}
+
+  def _write_all(self, message):
+    for ws_uuid in self.clients[self.gid]:
+      self.sockets[ws_uuid].write_message(message)
+  def _update_players(self):
+    self._write_all(json.dumps({'cmd': 'players', 'players': list(sorted(set([self.sockets[ws_uuid].user.username for ws_uuid in self.clients[self.gid]])))}))
   def initialize(self):
     pass
   def open(self):
     self.uuid = uuid.uuid4().hex
     self.sockets[self.uuid] = self
     self.user = current_user(self)
-    if user is None:
+    if self.user is None:
       self.close()
   def on_message(self, message):
     print('Received', message, 'from', self)
     content = json.loads(message)
     cmd = content['cmd']
-    gid = int(content['gid'])
     if cmd == 'connect':
+      gid = content['gid']
       if gid not in self.games:
         game = self._GAME.from_gid(gid)
         if game is not None:
-          self.games[gid] = game
-          self.clients[gid] = set()
-          self.clients[gid].add(self.uuid)
+          self.gid = gid
+          self.games[self.gid] = game
+          self.clients[self.gid] = set()
+          self.clients[self.gid].add(self.uuid)
       else:
-        self.clients[gid].add(self.uuid)
-      self.write_message(json.dumps({'cmd': 'chat', 'message': 'PREVIOUS MESSAGES'}))
-    elif self.uuid in self.clients[gid]:
+        self.gid = gid
+        self.clients[self.gid].add(self.uuid)
+      self._update_players()
+      self.write_message(json.dumps({'cmd': 'chat', 'sender': '[SYSTEM]', 'message': 'Successfully joined.'}))
+    elif self.uuid in self.clients[self.gid]:
       if cmd == 'chat':
-        for uuid in self.clients[gid]:
-          self.sockets[uuid].write_message(json.dumps({'cmd': 'chat', 'message': content['message']}))
+        self._write_all(json.dumps({'cmd': 'chat', 'sender': self.user.username, 'message': html.escape(content['message'])}))
 
+  def _cleanup(self):
+    self.clients[self.gid].remove(self.uuid)
   def on_close(self):
-    print('WebSocket closed:', self)
+    self._cleanup()
+    self._update_players()
+  def on_finish(self):
+    self._cleanup()
+    self._update_players()
 

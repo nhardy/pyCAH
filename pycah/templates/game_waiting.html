@@ -1,5 +1,14 @@
 {% include header.html %}
 <article>
+<table>
+<thead>
+<tr><th>Chat</th><th>Players</th></tr>
+</thead>
+<tbody>
+<tr><td id="chat"></td><td id="players"></td></tr>
+<tr><td><input id="message" type="text" onkeydown="if (event.keyCode == 13) chat();" /></td><td><button onclick="chat();">Send</button></td></tr>
+</tbody>
+</table>
 {% if game.is_in(user) %}
 <pre>
 /------------------+-\ /--------------------+-\

@@ -1,0 +1,44 @@
+// CLIENT
+{
+	"cmd": "connect",
+	"gid": "###GID###"
+}
+
+{
+	"cmd": "chat",
+	"message": "###MESSAGE###"
+}
+
+{
+	"cmd": "white_card",
+	"eid": "###EID###",
+	"cid": "###CID###"
+}
+
+{
+	"cmd": "best",
+	"identifier": "###IDENTIFIER###"
+}
+
+
+// SERVER
+{
+	"cmd": "players",
+	"players": ["###USERNAME###", "###USERNAME###", "###...###"]
+}
+{
+	"cmd": "chat",
+	"sender": "###USERNAME###",
+	"timestamp": "###TIMESTAMP###",
+	"message": "###MESSAGE###"
+}
+
+{
+	"cmd": "black_card",
+	"czar": "###USERNAME###",
+	"eid": "###EID###",
+	"cid": "###CID###",
+	"value": "###VALUE###"
+}
+
+
