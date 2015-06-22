@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS game_czar CASCADE;
 DROP TABLE IF EXISTS game_moves CASCADE;
 DROP TABLE IF EXISTS game_cards CASCADE;
 
+
 CREATE TABLE users (
 	uid BIGSERIAL PRIMARY KEY,
 	username CHARACTER VARYING(255) NOT NULL UNIQUE,
@@ -24,21 +25,55 @@ CREATE TABLE expansions (
 
 CREATE TABLE white_cards (
 	eid SMALLINT NOT NULL,
-	cid SMALLSERIAL,
+	cid SMALLINT NOT NULL DEFAULT 0,
 	trump BOOLEAN NOT NULL,        -- Might need other booleans?
 	value TEXT,
 	PRIMARY KEY (eid, cid),
 	FOREIGN KEY (eid) REFERENCES expansions(eid)
 );
 
+CREATE OR REPLACE FUNCTION wc_cid_auto()
+	RETURNS trigger AS $$
+BEGIN
+	SELECT COALESCE(MAX(cid) + 1, 1)
+	INTO NEW.cid
+	FROM white_cards
+	WHERE eid = NEW.eid;
+
+	RETURN NEW;
+END;
+$$ LANGUAGE plpgsql STRICT;
+
+CREATE TRIGGER wc_cid_auto
+	BEFORE INSERT ON white_cards
+	FOR EACH ROW WHEN (NEW.cid = 0)
+	EXECUTE PROCEDURE wc_cid_auto();
+
 CREATE TABLE black_cards (
 	eid SMALLINT NOT NULL,
-	cid SMALLSERIAL,
+	cid SMALLINT NOT NULL DEFAULT 0,
 	type SMALLINT NOT NULL,
 	value TEXT,
 	PRIMARY KEY (eid, cid),
 	FOREIGN KEY (eid) REFERENCES expansions(eid)
 );
+
+CREATE OR REPLACE FUNCTION bc_cid_auto()
+	RETURNS trigger AS $$
+BEGIN
+	SELECT COALESCE(MAX(cid) + 1, 1)
+	INTO NEW.cid
+	FROM black_cards
+	WHERE eid = NEW.eid;
+
+	RETURN NEW;
+END;
+$$ LANGUAGE plpgsql STRICT;
+
+CREATE TRIGGER bc_cid_auto
+	BEFORE INSERT ON black_cards
+	FOR EACH ROW WHEN (NEW.cid = 0)
+	EXECUTE PROCEDURE bc_cid_auto();
 
 CREATE TABLE games (
 	gid BIGSERIAL PRIMARY KEY,
@@ -65,7 +100,7 @@ CREATE TABLE game_expansions (
 
 CREATE TABLE game_czar (
 	gid BIGINT NOT NULL,
-	round SMALLSERIAL,
+	round SMALLINT NOT NULL DEFAULT 0,
 	czar_id BIGINT NOT NULL,
 	eid SMALLINT NOT NULL,
 	cid SMALLINT NOT NULL,
@@ -76,6 +111,23 @@ CREATE TABLE game_czar (
 	FOREIGN KEY (eid, cid) REFERENCES black_cards(eid, cid),
 	FOREIGN KEY (gid, winner_id) REFERENCES game_users(gid, uid)
 );
+
+CREATE OR REPLACE FUNCTION game_round_auto()
+	RETURNS trigger AS $$
+BEGIN
+	SELECT COALESCE(MAX(round) + 1, 1)
+	INTO NEW.round
+	FROM game_czar
+	WHERE gid = NEW.gid;
+
+	RETURN NEW;
+END;
+$$ LANGUAGE plpgsql STRICT;
+
+CREATE TRIGGER game_round_auto
+	BEFORE INSERT ON game_czar
+	FOR EACH ROW WHEN (NEW.round = 0)
+	EXECUTE PROCEDURE game_round_auto();
 
 CREATE TABLE game_moves (
 	gid BIGINT NOT NULL,
