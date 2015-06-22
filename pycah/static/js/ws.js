@@ -16,7 +16,9 @@ function init() {
 				document.getElementById("players").innerHTML = content["players"];
 				break;
 			case "chat":
-				document.getElementById("chat").innerHTML += "<p>&lt;" + content["sender"] + "&gt;: " + content["message"] + "</p>\n";
+				var chat = document.getElementById("chat");
+				chat.innerHTML += "<p>&lt;" + content["sender"] + "&gt;: " + content["message"] + "</p>\n";
+				chat.scrollTop = chat.scrollHeight;
 				break;
 		}
 	};
