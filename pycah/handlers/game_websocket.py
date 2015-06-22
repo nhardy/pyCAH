@@ -51,9 +51,12 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
         if len(msg) == 0:
           return
         if msg == '/start' and self.user == self.games[self.gid].creator and not self.games[self.gid].started:
+          self._write_all(json.dumps({'cmd': 'chat', 'sender': '[SYSTEM]', 'message': 'Game starting...'}))
           czar, black_card = self.games[self.gid].new_round()
           for ws_uuid in self.clients[self.gid]:
             ws = self.sockets[ws_uuid]
+            if not self.games[self.gid].is_in(ws.user):
+              continue
             msg = {
               'cmd': 'new_round',
               'czar': czar.username,
@@ -63,7 +66,6 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
               'hand': [{'eid': card.eid, 'cid': card.cid, 'value': card.value, 'trump': card.trump} for card in self.games[self.gid].get_hand(ws.user)]
             }
             ws.write_message(json.dumps(msg))
-          self._write_all(json.dumps({'cmd': 'chat', 'sender': '[SYSTEM]', 'message': 'Game started.'}))
         else:
           self._write_all(json.dumps({'cmd': 'chat', 'sender': self.user.username, 'message': html.escape(content['message'])}))
 
