@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from pycah.db.user import User
 from pycah.db.game import Game
 from pycah.db.expansion import Expansion

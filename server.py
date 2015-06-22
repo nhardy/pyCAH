@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import tornado.ioloop
 import tornado.web
 import random, string
