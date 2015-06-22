@@ -1,6 +1,7 @@
 from . import connection
 from .user import User
 from .cards import BlackCard, WhiteCard
+from .expansion import Expansion
 
 class Game:
   @classmethod
@@ -151,11 +152,11 @@ class Game:
   def expansions(self):
     cursor = connection.cursor()
     cursor.execute('''SELECT eid FROM game_expansions WHERE gid=%s''', (self.gid,))
-    eids = []
-    for expansion in cursor.fetchall():
-      eids.append(expansion[0])
+    expansions_list = []
+    for e in cursor.fetchall():
+      expansions_list.append(Expansion.from_eid(e[0]))
     connection.commit()
-    return eids
+    return expansions_list
 
   @property
   def started(self):
