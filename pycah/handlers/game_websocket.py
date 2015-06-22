@@ -27,7 +27,6 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
     if self.user is None:
       self.close()
   def on_message(self, message):
-    print('Received', message, 'from', self)
     content = json.loads(message)
     cmd = content['cmd']
     if cmd == 'connect':
@@ -45,7 +44,7 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
       self._update_players()
       self.write_message(json.dumps({'cmd': 'chat', 'sender': '[SYSTEM]', 'message': 'Successfully joined.'}))
     elif self.uuid in self.clients[self.gid]:
-      if cmd == 'chat':
+      if cmd == 'chat' and len(content['message']) > 0:
         self._write_all(json.dumps({'cmd': 'chat', 'sender': self.user.username, 'message': html.escape(content['message'])}))
 
   def _cleanup(self):
