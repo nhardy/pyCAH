@@ -82,7 +82,14 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
           self._round(self, self.games[self.gid].get_czar(), self.games[self.gid].get_black_card())
       elif cmd == 'white_card':
         self.games[self.gid].play_card(self.user, WhiteCard(int(content["eid"]), int(content["cid"])))
-        
+        if not any([self.games[self.gid].turn_over(self.sockets[ws_uuid].user) for ws_uuid in self.clients[self.gid] if self.games[self.gid].is_in(self.sockets[ws_uuid])]):
+          czar_ws = [ws for ws in self.clients[self.gid] if ws.user == self.games[self.gid].get_czar()][0]
+          msg = {
+            'cmd': 'vote_required',
+            'hands': [[{'eid': card.eid, 'cid': card.cid, 'value': card.value, 'trump': card.trump} for card in hand] for hand in self.games[self.gid].get_played_hands()]
+          }
+          czar_ws.write_message(json.dumps())
+
   def _cleanup(self):
     self.clients[self.gid].remove(self.uuid)
   def on_close(self):

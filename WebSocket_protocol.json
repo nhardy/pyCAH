@@ -58,3 +58,37 @@
 		}
 	]
 }
+
+{
+	"cmd": "vote_required",
+	"hands": [
+		[
+			{
+				"eid": "###EID###",
+				"cid": "###CID###",
+				"value": "###VALUE###",
+				"trump": false
+			},
+			{
+				"eid": "###EID###",
+				"cid": "###CID###",
+				"value": "###VALUE###",
+				"trump": true
+			}
+		],
+		[
+			{
+				"eid": "###EID###",
+				"cid": "###CID###",
+				"value": "###VALUE###",
+				"trump": false
+			},
+			{
+				"eid": "###EID###",
+				"cid": "###CID###",
+				"value": "###VALUE###",
+				"trump": true
+			}
+		]
+	]
+}

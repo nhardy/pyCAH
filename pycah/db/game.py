@@ -173,3 +173,22 @@ class Game:
     begun = cursor.fetchone()[0] == 1
     connection.commit()
     return begun
+
+  def turn_over(self, player):
+    cursor = connection.cursor()
+    cursor.execute('''SELECT %s-COUNT(*) FROM game_moves WHERE gid=%s AND round=(SELECT MAX(round) FROM game_czar WHERE gid=%s) AND uid=%s''', (self.get_black_card().answers, self.gid, self.gid, player.uid))
+    over = cursor.fetchone()[0] == 0
+    connection.commit()
+    return over
+
+  def get_played_hands(self):
+    cursor = connection.cursor()
+    cursor.execute('''SELECT eid, cid, uid FROM game_moves WHERE gid=%s AND round=(SELECT MAX(round) FROM game_czar WHERE gid=%s)''', (self.gid, self.gid))
+    hands = {}
+    for card in cursor.fetchall():
+      eid, cid, uid = card
+      if uid not in hands:
+        hands[uid] = []
+      hands[uid].append(WhiteCard(eid, cid))
+    connection.commit()
+    return list(hands.values())
