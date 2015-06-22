@@ -55,7 +55,7 @@ except Exception as e:
   raise e
 
 print('Testing random cards: ')
-cursor.execute('''SELECT value, type FROM black_cards black_cards ORDER BY RANDOM() LIMIT 1''')
+cursor.execute('''SELECT value, type FROM black_cards ORDER BY RANDOM() LIMIT 1''')
 black_card = cursor.fetchone()
 connection.commit()
 print(black_card[0])
