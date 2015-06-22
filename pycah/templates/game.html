@@ -1,5 +1,34 @@
 {% include header.html %}
 <article>
-<p>Coming soon...</p>
+<h2>Game</h2>
+<div id="game_container">
+	<div id="expansions_list">
+		<ul>
+{% for e in game.expansions %}
+			<li>{{ e.name }}</li>
+{% end for %}
+		</ul>
+	</div>
+	<div id="game">
+{% if not game.is_in(user) %}
+		<button onclick="join();">Join</button> <button onclick="spectate();">Spectate</button>
+{% else %}
+		<p>Waiting...</p>
+{% end if %}
+</form>
+	</div>
+</div>
+<h2>Chat</h2>
+<div id="chat_container">
+	<div id="chat">
+	</div>
+	<div id="players">
+	</div>
+	<div id="send_container">
+		<input id="message" type="text" autocomplete="off" onkeydown="if (event.keyCode == 13) chat();" />
+		<button onclick="chat();">Send</button>
+	</div>
+</div>
+<p>Link to game: <a href="/game/{{ game.gid }}">Share me</a></p>
 </article>
 {% include footer.html %}
