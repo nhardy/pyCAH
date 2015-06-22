@@ -66,7 +66,7 @@ class GameHandler(tornado.web.RequestHandler):
         if len(errors) > 0:
           self._create(errors)
         else:
-          game = Game.create(points_to_win, user, chosen_expansions)
+          game = Game.create(user, points_to_win, chosen_expansions)
           self.redirect('/game/{}'.format(game.gid))
       else:
         gid = re.search(r'^\/(\d+)$', page)
