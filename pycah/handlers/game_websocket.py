@@ -4,6 +4,7 @@ import uuid
 import html
 
 from ..db.game import Game
+from ..db.cards import WhiteCard
 from ..db.user import current_user
 
 
@@ -18,6 +19,16 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
       self.sockets[ws_uuid].write_message(message)
   def _update_players(self):
     self._write_all(json.dumps({'cmd': 'players', 'players': list(sorted(set([self.sockets[ws_uuid].user.username for ws_uuid in self.clients[self.gid]])))}))
+  def _round(self, ws, czar, black_card):
+    msg = {
+      'cmd': 'new_round',
+      'czar': czar.username,
+      'eid': black_card.eid,
+      'cid': black_card.cid,
+      'value': black_card.value,
+      'hand': [{'eid': card.eid, 'cid': card.cid, 'value': card.value, 'trump': card.trump} for card in self.games[self.gid].get_hand(ws.user)]
+    }
+    ws.write_message(json.dumps(msg))
   def initialize(self):
     pass
   def open(self):
@@ -42,33 +53,36 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
         self.gid = gid
         self.clients[self.gid].add(self.uuid)
       self._update_players()
-      self.write_message(json.dumps({'cmd': 'chat', 'sender': '[SYSTEM]', 'message': 'Successfully joined.'}))
-      if not self.games[self.gid].started and self.user == self.games[self.gid].creator:
-        self.write_message(json.dumps({'cmd': 'chat', 'sender': '[SYSTEM]', 'message': 'To start the game when ready, type /start'}))
+      self.write_message(json.dumps({'cmd': 'chat', 'sender': '[SYSTEM]', 'message': 'Successfully joined the chat.'}))
+      if self.games[self.gid].started and self.games[self.gid].is_in(self.user):
+        self.write_message(json.dumps({'cmd': 'chat', 'sender': '[SYSTEM]', 'message': 'Successfully joined the game.'}))
+        self._round(self, self.games[self.gid].get_czar(), self.games[self.gid].get_black_card())
+      else:
+        if self.user == self.games[self.gid].creator:
+          self.write_message(json.dumps({'cmd': 'chat', 'sender': '[SYSTEM]', 'message': 'To start the game when ready, type /start'}))
     elif self.uuid in self.clients[self.gid]:
       if cmd == 'chat':
         msg = content['message']
         if len(msg) == 0:
           return
-        if msg == '/start' and self.user == self.games[self.gid].creator and not self.games[self.gid].started:
+        if msg == '/start' and self.user == self.games[self.gid].creator and not self.games[self.gid].started and self.games[self.gid].get_num_players() > 2:
           self._write_all(json.dumps({'cmd': 'chat', 'sender': '[SYSTEM]', 'message': 'Game starting...'}))
           czar, black_card = self.games[self.gid].new_round()
           for ws_uuid in self.clients[self.gid]:
             ws = self.sockets[ws_uuid]
             if not self.games[self.gid].is_in(ws.user):
               continue
-            msg = {
-              'cmd': 'new_round',
-              'czar': czar.username,
-              'eid': black_card.eid,
-              'cid': black_card.cid,
-              'value': black_card.value,
-              'hand': [{'eid': card.eid, 'cid': card.cid, 'value': card.value, 'trump': card.trump} for card in self.games[self.gid].get_hand(ws.user)]
-            }
-            ws.write_message(json.dumps(msg))
+            self._round(ws, czar, black_card)
         else:
           self._write_all(json.dumps({'cmd': 'chat', 'sender': self.user.username, 'message': html.escape(content['message'])}))
-
+      elif cmd == 'join':
+        self.games[self.gid].add_player(self.user)
+        self.write_message(json.dumps({'cmd': 'chat', 'sender': '[SYSTEM]', 'message': 'Successfully joined the game.'}))
+        if self.games[self.gid].started:
+          self._round(self, self.games[self.gid].get_czar(), self.games[self.gid].get_black_card())
+      elif cmd == 'white_card':
+        self.games[self.gid].play_card(self.user, WhiteCard(int(content["eid"]), int(content["cid"])))
+        
   def _cleanup(self):
     self.clients[self.gid].remove(self.uuid)
   def on_close(self):

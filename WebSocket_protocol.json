@@ -5,6 +5,10 @@
 }
 
 {
+	"cmd": "join"
+}
+
+{
 	"cmd": "chat",
 	"message": "###MESSAGE###"
 }

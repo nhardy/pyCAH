@@ -82,6 +82,13 @@ class Game:
     connection.commit()
     return players
 
+  def get_num_players(self):
+    cursor = connection.cursor()
+    cursor.execute('''SELECT COUNT(*) FROM game_users WHERE gid=%s''', (self.gid,))
+    players = cursor.fetchone()[0]
+    connection.commit()
+    return players
+
   def get_random_player(self):
     cursor = connection.cursor()
     cursor.execute('''SELECT game_users.uid, users.username FROM game_users LEFT JOIN users on game_users.uid=users.uid WHERE gid=%s ORDER BY RANDOM() LIMIT 1''', (self.gid,))

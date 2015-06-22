@@ -24,6 +24,20 @@ function init() {
 				chat.innerHTML += "<p>&lt;" + content["sender"] + "&gt;: " + content["message"] + "</p>\n";
 				chat.scrollTop = chat.scrollHeight;
 				break;
+			case "new_round":
+				var game_html = "";
+				var gameDiv = document.getElementById("game");
+				var czar = content["czar"];
+				var card_value = content["value"];
+				var hand = content["hand"];
+				game_html += "<p>Czar: " + czar + "</p>\n<p>Black Card: " + card_value + "</p>\n";
+				game_html += "<ul>\n";
+				for (var c = 0; c < hand.length; c++) {
+					game_html += "<li><a href=\"javascript:playCard(" + hand[c]["eid"] + ", " + hand[c]["cid"] + ");\">" + hand[c]["value"] + "</a></li>\n";
+				}
+				game_html += "</ul>\n";
+				gameDiv.innerHTML = game_html;
+				break;
 			default:
 				alert(e.data);
 				break;
@@ -36,6 +50,15 @@ function chat() {
 	var message = messageBox.value;
 	ws.send(JSON.stringify({"cmd": "chat", "message": message}));
 	messageBox.value = "";
+}
+
+function join() {
+	ws.send(JSON.stringify({"cmd": "join"}));
+	document.getElementById("game").innerHTML = "<p>Waiting...</p>\n";
+}
+
+function playCard(eid, cid) {
+	ws.send(JSON.stringify({"cmd": "white_card", "eid": eid, "cid": cid}));
 }
 
 window.onload = function() {
