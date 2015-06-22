@@ -5,28 +5,29 @@ from .expansion import Expansion
 
 class Game:
   @classmethod
-  def create(cls, points_to_win, player, expansions):
+  def create(cls, creator, points_to_win, expansions):
     cursor = connection.cursor()
-    cursor.execute('''INSERT INTO games VALUES(DEFAULT,%s) RETURNING gid''', (points_to_win,))
+    cursor.execute('''INSERT INTO games VALUES(DEFAULT,%s,%s) RETURNING gid''', (creator.uid, points_to_win))
     gid = cursor.fetchone()[0]
-    cursor.execute('''INSERT INTO game_users VALUES(%s,%s)''', (gid, player.uid))
+    cursor.execute('''INSERT INTO game_users VALUES(%s,%s)''', (gid, creator.uid))
     for expansion in expansions:
       cursor.execute('''INSERT INTO game_expansions VALUES(%s,%s)''', (gid, expansion.eid))
     connection.commit()
-    return cls(gid, points_to_win)
+    return cls(gid, creator, points_to_win)
 
   @classmethod
   def from_gid(cls, gid):
     cursor = connection.cursor()
-    cursor.execute('''SELECT win_points FROM games WHERE gid=%s''', (gid,))
+    cursor.execute('''SELECT uid, win_points FROM games WHERE gid=%s''', (gid,))
     game = cursor.fetchone()
     if game is None:
       return None # No game with that gid
     else:
-      return cls(gid, game[0])
+      return cls(gid, User.from_uid(game[0]), game[1])
 
-  def __init__(self, gid, points_to_win):
+  def __init__(self, gid, creator, points_to_win):
     self.gid = gid
+    self.creator = creator
     self.points_to_win = points_to_win
 
   def add_player(self, player):

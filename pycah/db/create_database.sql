@@ -42,7 +42,9 @@ CREATE TABLE black_cards (
 
 CREATE TABLE games (
 	gid BIGSERIAL PRIMARY KEY,
-	win_points SMALLINT NOT NULL
+	uid BIGINT NOT NULL,
+	win_points SMALLINT NOT NULL,
+	FOREIGN KEY (uid) REFERENCES users(uid)
 );
 
 CREATE TABLE game_users (
