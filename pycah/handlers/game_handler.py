@@ -6,8 +6,8 @@ from ..db.game import Game
 import re
 
 class GameHandler(tornado.web.RequestHandler):
-  def _create(self, errors=False):
-    self.render('game_create.html', handler=self, title='Create Game', errors=errors, expansions=Expansion.list_all())
+  def _create(self, user, errors=False):
+    self.render('game_create.html', handler=self, title='Create Game', user=user, errors=errors, expansions=Expansion.list_all())
   def _waiting(self, game, user):
     self.render('game_waiting.html', handler=self, title='Waiting Room', game=game, user=user)
   def _game(self, game, user):
@@ -20,7 +20,7 @@ class GameHandler(tornado.web.RequestHandler):
       self.redirect('/')
     else:
       if page == '':
-        self._create()
+        self._create(user)
       else:
         gid = re.search(r'^\/(\d+)((?:\/spectate)?)$', page)
         if gid is None:
