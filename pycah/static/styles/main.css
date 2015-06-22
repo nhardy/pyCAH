@@ -1,3 +1,41 @@
+body{
+	background: #000000;
+}
+header, article, footer{
+	background: #EEEEEE;
+	color: #333333;
+}
+
+#game_container, #chat_container{
+	width: 100%;
+}
+#game_container{
+	height: 200px;
+}
+#chat_container{
+	height: 200px;
+}
+#chat_container #chat{
+	width: 80%;
+	height: 180px;
+	overflow-y: scroll;
+}
+#chat_container #chat p{
+	margin-top: 0em;
+	margin-bottom: 0em;
+	line-height: 1.2;
+}
+#chat_container #players{
+	width: 20%;
+	height: 200px;
+	float: right;
+}
+#chat_container #send_container{
+	width: 100%;
+	height: 20px;
+}
+#chat_container
+
 .nowrap{
 	white-space: nowrap;
 }

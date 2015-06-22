@@ -1,39 +1,29 @@
 {% include header.html %}
 <article>
-<table>
-<thead>
-<tr><th>Chat</th><th>Players</th></tr>
-</thead>
-<tbody>
-<tr><td id="chat"></td><td id="players"></td></tr>
-<tr><td><input id="message" type="text" onkeydown="if (event.keyCode == 13) chat();" /></td><td><button onclick="chat();">Send</button></td></tr>
-</tbody>
-</table>
+<h2>Game</h2>
+<div id="game_container">
+	<div id="expansions_list">
+		<ul>
+{% for e in game.expansions %}
+			<li>{{ e.name }}</li>
+{% end for %}
+		</ul>
+	</div>
+</div>
+<h2>Chat</h2>
+<div id="chat_container">
+	<div id="chat">
+	</div>
+	<div id="players">
+	</div>
+	<div id="send_container">
+		<input id="message" type="text" onkeydown="if (event.keyCode == 13) chat();" />
+		<button onclick="chat();">Send</button>
+	</div>
+</div>
 {% if game.is_in(user) %}
-<pre>
-/------------------+-\ /--------------------+-\
-| Current players  | | | Expansions         | |
-+------------------+-+ +--------------------+-+
-| user1            |^| | Base               |^|
-| user2            | | | Australian Edition | |
-| ...              |v| | CAHe1              | |
-+------------------+-+ | CAHe2              | |
-| Link: [link]     | | | ...                |v|
-\------------------+-/ \--------------------+-/
-</pre>
 <p>Link to game: <a href="/game/{{ game.gid }}">Share me</a></p>
 {% else %}
-<pre>
-/------------------+-\ /--------------------+-\
-| Current players  | | | Expansions         | |
-+------------------+-+ +--------------------+-+
-| user1            |^| | Base               |^|
-| user2            | | | Australian Edition | |
-| ...              |v| | CAHe1              | |
-+------------------+-+ | CAHe2              | |
-| [Join][Spectate] | | | ...                |v|
-\------------------+-/ \--------------------+-/
-</pre>
 <form method="POST">
 <input type="submit" name="do" value="Join" /> <input type="submit" name="do" value="Spectate">
 </form>
