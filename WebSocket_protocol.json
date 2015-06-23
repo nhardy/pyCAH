@@ -20,8 +20,21 @@
 }
 
 {
-	"cmd": "best",
-	"identifier": "###IDENTIFIER###"
+	"cmd": "vote",
+	"hand": [
+		{
+			"eid": "###EID###",
+			"cid": "###CID###",
+			"value": "###VALUE###",
+			"trump": false
+		},
+		{
+			"eid": "###EID###",
+			"cid": "###CID###",
+			"value": "###VALUE###",
+			"trump": true
+		}
+	]
 }
 
 
