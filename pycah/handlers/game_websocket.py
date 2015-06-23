@@ -18,7 +18,8 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
     for ws_uuid in self.clients[self.gid]:
       self.sockets[ws_uuid].write_message(message)
   def _update_players(self):
-    self._write_all(json.dumps({'cmd': 'players', 'players': list(sorted(set([self.sockets[ws_uuid].user.username for ws_uuid in self.clients[self.gid]])))}))
+    if self.gid in self.clients:
+      self._write_all(json.dumps({'cmd': 'players', 'players': list(sorted(set([self.sockets[ws_uuid].user.username for ws_uuid in self.clients[self.gid]])))}))
   def _round(self, ws, czar, black_card):
     msg = {
       'cmd': 'new_round',
