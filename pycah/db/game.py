@@ -183,7 +183,7 @@ class Game:
 
   def get_played_hands(self):
     cursor = connection.cursor()
-    cursor.execute('''SELECT eid, cid, uid FROM game_moves WHERE gid=%s AND round=(SELECT MAX(round) FROM game_czar WHERE gid=%s)''', (self.gid, self.gid))
+    cursor.execute('''SELECT eid, cid, uid FROM game_moves WHERE gid=%s AND round=(SELECT MAX(round) FROM game_czar WHERE gid=%s) ORDER BY RANDOM()''', (self.gid, self.gid))
     hands = {}
     for card in cursor.fetchall():
       eid, cid, uid = card
@@ -192,3 +192,30 @@ class Game:
       hands[uid].append(WhiteCard(eid, cid))
     connection.commit()
     return list(hands.values())
+
+  def czar_pick(self, hand):
+    cursor = connection.cursor()
+    first_card = hand[0]
+    cursor.execute('''
+                   UPDATE game_czar
+                    SET winner_id=(
+                                   SELECT uid FROM game_moves
+                                    WHERE
+                                      gid=%s AND
+                                      round=(SELECT MAX(round) FROM game_czar WHERE gid=%s) AND
+                                      eid=%s AND cid=%s
+                                   )
+                    WHERE
+                      gid=%s AND
+                      round=(SELECT MAX(round) FROM game_czar WHERE gid=%s)
+                    RETURNING winner_id
+                   ''', (self.gid, self.gid, first_card.eid, first_card.cid, self.gid, self.gid)
+                  )
+    uid = cursor.fetchone()
+    if uid is None:
+      connection.commit()
+      return False
+    else:
+      user = User.from_uid(uid[0])
+      connection.commit()
+      return user

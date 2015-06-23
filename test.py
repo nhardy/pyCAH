@@ -86,5 +86,13 @@ for user in [u1, u2, u3]:
   for i in range(b_card.answers):
     g.play_card(user, hand[i])
     print(user.username, 'played', hand[i].value)
+print('Round over, voting begins...' if all([g.turn_over(u) for u in [u1, u2, u3] if u != czar]) else 'A problem occurred. Round is not over for some reason.')
+played_hands = g.get_played_hands()
+print('Czar sees:', [[c.value for c in hand] for hand in played_hands])
+print('Czar picks:', [c.value for c in played_hands[0]])
+winner = g.czar_pick(played_hands[0])
+print('Pick failed.' if not winner else 'Winner was {}.'.format(winner.username))
 
 print('Done.')
+
+User.create('nhardy', 'password')
