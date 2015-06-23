@@ -8,6 +8,13 @@ function init() {
 		ws.send(JSON.stringify({"cmd": "connect", "gid": gid}));
 	};
 
+	ws.onclose = function() {
+		var chat = document.getElementById("chat");
+		chat.innerHTML += "<p>&lt;[SYSTEM]&gt;: Lost connection... Retrying...</p>\n";
+		chat.scrollTop = chat.scrollHeight;
+		init();
+	};
+
 	ws.onmessage = function(e) {
 		var content = JSON.parse(e.data);
 		var cmd = content["cmd"];
@@ -37,6 +44,11 @@ function init() {
 				}
 				game_html += "</ul>\n";
 				gameDiv.innerHTML = game_html;
+				break;
+			case "vote_required":
+				alert(content["hands"]);
+				var hand = parseInt(prompt("Enter hand number (0 indexed): "));
+				ws.send(JSON.stringify({"cmd": "vote", "hand": content["hands"][hand]}))
 				break;
 			default:
 				alert(e.data);
