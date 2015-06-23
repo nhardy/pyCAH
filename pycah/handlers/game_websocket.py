@@ -37,6 +37,7 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
     self.user = current_user(self)
     if self.user is None:
       self.close()
+    self.gid = None
   def on_message(self, message):
     content = json.loads(message)
     cmd = content['cmd']
@@ -91,7 +92,8 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
           czar_ws.write_message(json.dumps(msg))
 
   def _cleanup(self):
-    self.clients[self.gid].remove(self.uuid)
+    if self.gid in self.clients:
+      self.clients[self.gid].remove(self.uuid)
   def on_close(self):
     self._cleanup()
     self._update_players()
