@@ -36,10 +36,13 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
     self.uuid = uuid.uuid4().hex
     self.sockets[self.uuid] = self
     self.user = current_user(self)
+    self.gid = None
     if self.user is None:
       self.close()
-    self.gid = None
   def on_message(self, message):
+    if self.user is None:
+      self.close()
+      return
     content = json.loads(message)
     cmd = content['cmd']
     if cmd == 'connect':
