@@ -18,7 +18,7 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
     for ws_uuid in self.clients[self.gid]:
       self.sockets[ws_uuid].write_message(message)
   def _update_players(self):
-    if self.gid in self.clients:
+    if self.gid in self.clients and self.user is not None:
       self._write_all(json.dumps({'cmd': 'players', 'players': list(sorted(set([self.sockets[ws_uuid].user.username for ws_uuid in self.clients[self.gid]])))}))
   def _round(self, ws, czar, black_card):
     msg = {
@@ -55,9 +55,9 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
         self.gid = gid
         self.clients[self.gid].add(self.uuid)
       self._update_players()
-      self.write_message(json.dumps({'cmd': 'chat', 'sender': '[SYSTEM]', 'message': 'Successfully joined the chat.'}))
+      self._write_all(json.dumps({'cmd': 'chat', 'sender': '[SYSTEM]', 'message': '{} joined the chat.'.format(self.user.username)}))
       if self.games[self.gid].started and self.games[self.gid].is_in(self.user):
-        self.write_message(json.dumps({'cmd': 'chat', 'sender': '[SYSTEM]', 'message': 'Successfully joined the game.'}))
+        self._write_all(json.dumps({'cmd': 'chat', 'sender': '[SYSTEM]', 'message': '{} joined the game.'.format(self.user.username)}))
         self._round(self, self.games[self.gid].get_czar(), self.games[self.gid].get_black_card())
       else:
         if self.user == self.games[self.gid].creator:
@@ -79,7 +79,7 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
           self._write_all(json.dumps({'cmd': 'chat', 'sender': self.user.username, 'message': html.escape(content['message'])}))
       elif cmd == 'join':
         self.games[self.gid].add_player(self.user)
-        self.write_message(json.dumps({'cmd': 'chat', 'sender': '[SYSTEM]', 'message': 'Successfully joined the game.'}))
+        self._write_all(json.dumps({'cmd': 'chat', 'sender': '[SYSTEM]', 'message': '{} joined the game.'.format(self.user.username)}))
         if self.games[self.gid].started:
           self._round(self, self.games[self.gid].get_czar(), self.games[self.gid].get_black_card())
       elif cmd == 'white_card':
