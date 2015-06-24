@@ -46,7 +46,7 @@ function init() {
 				gameDiv.innerHTML = game_html;
 				break;
 			case "vote_required":
-				alert(content["hands"]);
+				alert(JSON.stringify(content["hands"]));
 				var hand = parseInt(prompt("Enter hand number (0 indexed): "));
 				ws.send(JSON.stringify({"cmd": "vote", "hand": content["hands"][hand]}))
 				break;
