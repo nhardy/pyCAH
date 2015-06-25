@@ -101,6 +101,12 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
         if self.user == self.games[self.gid].get_czar():
           hand = [WhiteCard(c['eid'], c['cid']) for c in content['hand']]
           self.games[self.gid].czar_pick(hand)
+          czar, black_card = self.games[self.gid].new_round()
+          for ws_uuid in self.clients[self.gid]:
+            ws = self.sockets[ws_uuid]
+            if not self.games[self.gid].is_in(ws.user):
+              continue
+            self._round(ws, czar, black_card)
         
 
   def _cleanup(self):
