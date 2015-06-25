@@ -33,11 +33,11 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
     ws.write_message(json.dumps(msg))
   def _new_round(self):
     czar, black_card = self.games[self.gid].new_round()
-      for ws_uuid in self.clients[self.gid]:
-        ws = self.sockets[ws_uuid]
-        if not self.games[self.gid].is_in(ws.user):
-          continue
-        self._round(ws, czar, black_card)
+    for ws_uuid in self.clients[self.gid]:
+      ws = self.sockets[ws_uuid]
+      if not self.games[self.gid].is_in(ws.user):
+        continue
+      self._round(ws, czar, black_card)
   def initialize(self):
     pass
   def open(self):
