@@ -109,6 +109,7 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
   def _cleanup(self):
     if self.gid in self.clients:
       self.clients[self.gid].remove(self.uuid)
+      self._write_all(json.dumps({'cmd': 'chat', 'sender': '[SYSTEM]', 'message': '{} left the chat.'.format(self.user.username)}))
   def on_close(self):
     self._cleanup()
     self._update_players()
