@@ -27,7 +27,13 @@ function init() {
 			case "players":
 				var players_html = "";
 				for (var p = 0; p < content["players"].length; p++) {
-					players_html += "<p>" + content["players"][p] + "</p>\n";
+					var playerClass = "";
+					if (!content["players"][p]["connected"]) {
+						playerClass = " class=\"not_connected\"";
+					}else if(content["players"][p]["in_game"]){
+						playerClass = " class=\"in_game\"";
+					}
+					players_html += "<p" + playerClass + ">" + content["players"][p]["username"] + "</p>\n";
 				}
 				document.getElementById("players").innerHTML = players_html
 				break;

@@ -33,6 +33,12 @@ header, article, footer{
 	vertical-align: top;
 	text-align: right;
 }
+#chat_container #players p.not_connected{
+	color: #FF0000;
+}
+#chat_container #players p.in_game{
+	color: #00FF00;
+}
 #chat_container #send_container{
 	width: 100%;
 	height: 30px;

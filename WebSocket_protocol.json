@@ -41,7 +41,18 @@
 // SERVER
 {
 	"cmd": "players",
-	"players": ["###USERNAME###", "###USERNAME###", "###...###"]
+	"players": [
+		{
+			"username": "###USERNAME###",
+			"connected": true,
+			"in_game": false,
+		},
+		{
+			"username": "###USERNAME###",
+			"connected": false,
+			"in_game": true
+		}
+	]
 }
 {
 	"cmd": "chat",

@@ -19,7 +19,12 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
       self.sockets[ws_uuid].write_message(message)
   def _update_players(self):
     if self.gid in self.clients and self.user is not None:
-      self._write_all(json.dumps({'cmd': 'players', 'players': list(sorted(set([self.sockets[ws_uuid].user.username for ws_uuid in self.clients[self.gid]])))}))
+      game_players = {u.username: (False, True) for u in self.games[self.gid].get_players()}
+      for ws_uuid in self.clients[self.gid]:
+        username = self.sockets[ws_uuid].user.username
+        game_players[username] = (True, True if username in game_players else False)
+      players_list = [{'username': username, 'connected': pair[0], 'in_game': pair[1]} for username, pair in game_players.items()]
+      self._write_all(json.dumps({'cmd': 'players', 'players': list(sorted(players_list, key=lambda p: (not p['in_game'], not p['connected'], p['username'])))}))
   def _round(self, ws, czar, black_card):
     ws.write_message(json.dumps({'cmd': 'chat', 'sender': '[SYSTEM', 'message': ('You are the card czar.' if ws.user == czar else '{} is the card czar.'.format(czar.username))}))
     msg = {
@@ -87,6 +92,7 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
           self._write_all(json.dumps({'cmd': 'chat', 'sender': self.user.username, 'message': html.escape(content['message'])}))
       elif cmd == 'join':
         self.games[self.gid].add_player(self.user)
+        self._update_players()
         self._write_all(json.dumps({'cmd': 'chat', 'sender': '[SYSTEM]', 'message': '{} joined the game.'.format(self.user.username)}))
         if self.games[self.gid].started:
           self._round(self, self.games[self.gid].get_czar(), self.games[self.gid].get_black_card())
