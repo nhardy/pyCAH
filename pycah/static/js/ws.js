@@ -82,9 +82,6 @@ function join() {
 
 function playCard(eid, cid) {
 	ws.send(JSON.stringify({"cmd": "white_card", "eid": eid, "cid": cid}));
-	// Should probably wait for confirmation from the server that said card has been played
-	var cardLink = document.getElementById("wc_" + eid + "_" + cid);
-	cardLink.parentNode.removeChild(cardLink);
 }
 
 window.onload = function() {
