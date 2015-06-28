@@ -17,7 +17,7 @@
 <br />
 <input type="submit" value="Login" />
 <br />
-<span><a href="/register">Register</a> as new user instead.</span>
+<span><a href="/register{% if handler.get_query_argument('return', None) is not None %}?return={{ url_escape(handler.get_query_argument('return', '%2F')) }}{% end if %}">Register</a> as new user instead.</span>
 </form>
 </article>
 {% include footer.html %}

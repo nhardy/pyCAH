@@ -1,4 +1,4 @@
-import tornado.web
+import tornado.web, tornado.escape
 from ..db.user import current_user
 from ..db.expansion import Expansion
 from ..db.game import Game
@@ -15,7 +15,7 @@ class GameHandler(tornado.web.RequestHandler):
   def get(self, page):
     user = current_user(self)
     if not user:
-      self.redirect('/')
+      self.redirect('/login?return={}'.format(tornado.escape.url_escape(self.request.uri)))
     else:
       if page == '':
         self._create(user)
@@ -35,7 +35,7 @@ class GameHandler(tornado.web.RequestHandler):
   def post(self, page):
     user = current_user(self)
     if not user:
-      self.redirect('/')
+      self.redirect('/login?return={}'.format(tornado.escape.url_escape(self.request.uri)))
     else:
       if page == '':
         errors = []
@@ -67,11 +67,11 @@ class GameHandler(tornado.web.RequestHandler):
       else:
         gid = re.search(r'^\/(\d+)$', page)
         if gid is None:
-          self.redirect('/')
+          self.redirect('/game')
         else:
           game = Game.from_gid(gid.group(1))
           if game is None:
-            self.redirect('/')
+            self.redirect('/game')
           else:
             do = self.get_argument('do')
             if do == 'Join':
