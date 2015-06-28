@@ -60,7 +60,7 @@ class GameHandler(tornado.web.RequestHandler):
         elif sum([e.num_white for e in chosen_expansions]) < 100:
           errors.append('You have not selected sufficient white cards.')
         if len(errors) > 0:
-          self._create(errors)
+          self._create(user ,errors)
         else:
           game = Game.create(user, points_to_win, chosen_expansions)
           self.redirect('/game/{}'.format(game.gid))

@@ -1,6 +1,16 @@
 {% include header.html %}
 <article>
 <form method="POST">
+{% if errors %}
+<div id="errors">
+<p>The following errors occurred whilst attempting to create a new game:</p>
+<ul>
+{% for e in errors %}
+<li>{{ e }}</li>
+{% end for %}
+</ul>
+</div>
+{% end if %}
 <label for="points">Points to win</label>:
 <br />
 <input type="number" name="points" value="6" min="2" max="32" />
