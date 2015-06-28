@@ -12,6 +12,18 @@ header, article, footer{
 #game_container{
 	height: 200px;
 }
+#game_container #expansions_list ul{
+	list-style: none;
+}
+#game_container #expansions_list ul li{
+	display: inline;
+}
+#game_container #game ul{
+	list-style: none;
+}
+#game_container #game ul li{
+	display: inline;
+}
 #chat_container{
 	height: 200px;
 }
