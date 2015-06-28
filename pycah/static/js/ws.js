@@ -45,6 +45,12 @@ function init() {
 				game_html += "</ul>\n";
 				gameDiv.innerHTML = game_html;
 				break;
+			case "play_successful":
+				var eid = content["eid"];
+				var cid = content["cid"];
+				var cardElement = document.getElementById("wc_" + eid + "_" + cid);
+				cardElement.parentNode.removeChild(cardElement);
+				break;
 			case "vote_required":
 				alert(JSON.stringify(content["hands"]));
 				var hand = parseInt(prompt("Enter hand number (0 indexed): "));

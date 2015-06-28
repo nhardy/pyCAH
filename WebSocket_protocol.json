@@ -73,6 +73,12 @@
 }
 
 {
+	"cmd": "play_successful",
+	"eid": "###EID###",
+	"cid": "###CID###"
+}
+
+{
 	"cmd": "vote_required",
 	"hands": [
 		[

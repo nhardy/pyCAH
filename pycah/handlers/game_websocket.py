@@ -89,7 +89,8 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
         if self.games[self.gid].started:
           self._round(self, self.games[self.gid].get_czar(), self.games[self.gid].get_black_card())
       elif cmd == 'white_card':
-        self.games[self.gid].play_card(self.user, WhiteCard(int(content["eid"]), int(content["cid"])))
+        if self.games[self.gid].play_card(self.user, WhiteCard(int(content['eid']), int(content["cid"]))):
+          self.write_message(json.dumps({'cmd': 'play_successful', 'eid': content['eid'], 'cid': content['cid']}))
         if all([self.games[self.gid].turn_over(self.sockets[ws_uuid].user) for ws_uuid in self.clients[self.gid] if self.games[self.gid].is_in(self.sockets[ws_uuid].user) and self.sockets[ws_uuid].user != self.games[self.gid].get_czar()]):
           czar_ws = [self.sockets[ws_uuid] for ws_uuid in self.clients[self.gid] if self.sockets[ws_uuid].user == self.games[self.gid].get_czar()][0]
           msg = {
