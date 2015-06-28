@@ -6,7 +6,7 @@ class LoginHandler(tornado.web.RequestHandler):
     self.render('login.html', handler=self, title='Login', user=None, errors=errors)
   def get(self):
     if current_user(self):
-      self.redirect('/')
+      self.redirect(self.get_argument('return', default='/'))
     else:
       self._page()
   def post(self):
@@ -19,5 +19,5 @@ class LoginHandler(tornado.web.RequestHandler):
       self._page(['Incorrect password.'])
     else:
       self.set_secure_cookie('uid', str(user.uid))
-      self.redirect('/')
+      self.redirect(self.get_argument('return', default='/'))
 

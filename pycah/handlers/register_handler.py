@@ -7,7 +7,7 @@ class RegisterHandler(tornado.web.RequestHandler):
     self.render('register.html', handler=self, title='Register', user=None, errors=errors)
   def get(self):
     if current_user(self):
-      self.redirect('/')
+      self.redirect(self.get_argument('return', default='/'))
     else:
       self._page()
   def post(self):
@@ -28,4 +28,4 @@ class RegisterHandler(tornado.web.RequestHandler):
     else:
       user = User.create(username, password)
       self.set_secure_cookie('uid', str(user.uid))
-      self.redirect('/')
+      self.redirect(self.get_argument('return', default='/'))
