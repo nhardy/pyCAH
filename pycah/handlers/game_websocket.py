@@ -31,6 +31,13 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
       'hand': [{'eid': card.eid, 'cid': card.cid, 'value': card.value, 'trump': card.trump} for card in self.games[self.gid].get_hand(ws.user)]
     }
     ws.write_message(json.dumps(msg))
+  def _new_round(self):
+    czar, black_card = self.games[self.gid].new_round()
+    for ws_uuid in self.clients[self.gid]:
+      ws = self.sockets[ws_uuid]
+      if not self.games[self.gid].is_in(ws.user):
+        continue
+      self._round(ws, czar, black_card)
   def initialize(self):
     pass
   def open(self):
@@ -75,12 +82,7 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
         elif msg[0] == '/':
           if msg == '/start' and self.user == self.games[self.gid].creator and not self.games[self.gid].started and self.games[self.gid].get_num_players() > 2:
             self._write_all(json.dumps({'cmd': 'chat', 'sender': '[SYSTEM]', 'message': 'Game starting...'}))
-            czar, black_card = self.games[self.gid].new_round()
-            for ws_uuid in self.clients[self.gid]:
-              ws = self.sockets[ws_uuid]
-              if not self.games[self.gid].is_in(ws.user):
-                continue
-              self._round(ws, czar, black_card)
+            self._new_round()
         else:
           self._write_all(json.dumps({'cmd': 'chat', 'sender': self.user.username, 'message': html.escape(content['message'])}))
       elif cmd == 'join':
@@ -102,11 +104,13 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
         if self.user == self.games[self.gid].get_czar():
           hand = [WhiteCard(c['eid'], c['cid']) for c in content['hand']]
           self.games[self.gid].czar_pick(hand)
+          self._new_round()
         
 
   def _cleanup(self):
     if self.gid in self.clients:
       self.clients[self.gid].remove(self.uuid)
+      self._write_all(json.dumps({'cmd': 'chat', 'sender': '[SYSTEM]', 'message': '{} left the chat.'.format(self.user.username)}))
   def on_close(self):
     self._cleanup()
     self._update_players()

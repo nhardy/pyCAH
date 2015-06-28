@@ -1,17 +1,22 @@
 var ws;
 var gid = parseInt((/\/game\/(\d+)/i).exec(window.location.pathname)[1]);
+var lostConnection = false;
 
 function init() {
 	ws = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port + "/ws");
 
 	ws.onopen = function() {
+		lostConnection = false;
 		ws.send(JSON.stringify({"cmd": "connect", "gid": gid}));
 	};
 
 	ws.onclose = function() {
-		var chat = document.getElementById("chat");
-		chat.innerHTML += "<p>&lt;[SYSTEM]&gt;: Lost connection... Retrying...</p>\n";
-		chat.scrollTop = chat.scrollHeight;
+		if(!lostConnection) {
+			var chat = document.getElementById("chat");
+			chat.innerHTML += "<p>&lt;[SYSTEM]&gt;: Lost connection... Retrying...</p>\n";
+			chat.scrollTop = chat.scrollHeight;
+			lostConnection = true;
+		}
 		init();
 	};
 
@@ -40,7 +45,7 @@ function init() {
 				game_html += "<p>Czar: " + czar + "</p>\n<p>Black Card: " + card_value + "</p>\n";
 				game_html += "<ul>\n";
 				for (var c = 0; c < hand.length; c++) {
-					game_html += "<li><a href=\"javascript:playCard(" + hand[c]["eid"] + ", " + hand[c]["cid"] + ");\">" + hand[c]["value"] + "</a></li>\n";
+					game_html += "<li id=\"wc_" + hand[c]["eid"] + "_" + hand[c]["cid"] + "\"><a href=\"javascript:playCard(" + hand[c]["eid"] + ", " + hand[c]["cid"] + ");\">" + hand[c]["value"] + "</a></li>\n";
 				}
 				game_html += "</ul>\n";
 				gameDiv.innerHTML = game_html;
@@ -77,6 +82,9 @@ function join() {
 
 function playCard(eid, cid) {
 	ws.send(JSON.stringify({"cmd": "white_card", "eid": eid, "cid": cid}));
+	// Should probably wait for confirmation from the server that said card has been played
+	var cardLink = document.getElementById("wc_" + eid + "_" + cid);
+	cardLink.parentNode.removeChild(cardLink);
 }
 
 window.onload = function() {

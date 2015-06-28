@@ -5,7 +5,7 @@ from pycah.db.game import Game
 from pycah.db.expansion import Expansion
 from pycah.db import connection
 
-import re, json
+import re, json, time
 
 connection.set_session(autocommit=True)
 cursor = connection.cursor()
@@ -86,6 +86,7 @@ for user in [u1, u2, u3]:
   for i in range(b_card.answers):
     g.play_card(user, hand[i])
     print(user.username, 'played', hand[i].value)
+    time.sleep(0.1)
 print('Round over, voting begins...' if all([g.turn_over(u) for u in [u1, u2, u3] if u != czar]) else 'A problem occurred. Round is not over for some reason.')
 played_hands = g.get_played_hands()
 print('Czar sees:', [[c.value for c in hand] for hand in played_hands])
