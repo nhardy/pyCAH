@@ -26,7 +26,7 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
       players_list = [{'username': username, 'connected': pair[0], 'in_game': pair[1]} for username, pair in game_players.items()]
       self._write_all(json.dumps({'cmd': 'players', 'players': list(sorted(players_list, key=lambda p: (not p['in_game'], not p['connected'], p['username'])))}))
   def _round(self, ws, czar, black_card):
-    ws.write_message(json.dumps({'cmd': 'chat', 'sender': '[SYSTEM', 'message': ('You are the card czar.' if ws.user == czar else '{} is the card czar.'.format(czar.username))}))
+    ws.write_message(json.dumps({'cmd': 'chat', 'sender': '[SYSTEM]', 'message': ('You are the card czar.' if ws.user == czar else '{} is the card czar.'.format(czar.username))}))
     msg = {
       'cmd': 'new_round',
       'czar': czar.username,
